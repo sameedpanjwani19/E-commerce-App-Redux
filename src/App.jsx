@@ -1,0 +1,61 @@
+import React, { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux';
+import { addCartItem } from './config/reducers/cartSlice';
+import Navbar from './component/Navbar';
+import './tailwind.css'
+
+const App = () => {
+
+  const [products, setProducts] = useState(null)
+
+
+  //selector
+  const selector = useSelector(state => state.cart.cartItems);
+  console.log(selector);
+
+  // dispatch
+  const dispatch = useDispatch()
+
+  useEffect(() => {
+    fetch('https://dummyjson.com/products')
+      .then(res => res.json())
+      .then(res => {
+        setProducts(res.products)
+      })
+      .catch(err => console.log(err))
+  }, [])
+
+  const addToCart = (item) => {
+    dispatch(addCartItem({
+      item
+    }))
+  }
+
+  return (
+    <>
+     <Navbar/>
+      <div style={{
+        display: "flex",
+        justifyContent: "center",
+        flexWrap: "wrap",
+        gap: "10px"
+      }}>
+        {products ? products.map((item) => {
+          return <div style={{
+            border: "1px solid black",
+            borderRadius: "20px",
+            padding: "20px",
+            margin: "10px"
+          }} key={item.id}>
+            <img width="200" src={item.thumbnail} alt="productImg" />
+            <h2>{item.title.slice(0, 10) + "..."}</h2>
+            <h1>{item.price}</h1>
+            <button onClick={() => addToCart(item)}>add To cart</button>
+          </div>
+        }) : <p>Item not found</p>}
+      </div>
+    </>
+  )
+}
+
+export default App
